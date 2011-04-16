@@ -16,7 +16,5 @@ Gem::Specification.new do |s|
   s.executables = [ "wsdl2ruby.rb", "xsd2ruby.rb" ]
   # don't reference the test until we see it execute fully and successfully
   s.test_file = "test/runner.rb"
-  # disable rdoc generation until we've got more
-  s.has_rdoc = false
   s.add_dependency("httpclient", ">= 2.1.1")
 end
