@@ -141,8 +141,11 @@ public
       @reftarget = nil
     else
       if obj.is_a?(SOAPEnvelope)
+        # xsi:nil="true" can appear even if dumping without explicit type.
         Generator.assign_ns(attrs, ns, XSD::InstanceNamespace)
-        Generator.assign_ns(attrs, ns, XSD::Namespace)
+        if @generate_explicit_type
+          Generator.assign_ns(attrs, ns, XSD::Namespace)
+        end
       end
       obj.encode(self, ns, attrs) do |child|
 	indent_backup, @indent = @indent, @indent + @indentstr
@@ -270,7 +273,7 @@ private
 
   def get_encode_char_regexp
     ENCODE_CHAR_REGEXP[XSD::Charset.encoding] ||=
-      Regexp.new("[#{EncodeMap.keys.join}]")
+      Regexp.new("[#{EncodeMap.keys.join}]", nil, XSD::Charset.encoding)
   end
 
   def find_handler(encodingstyle)
@@ -294,6 +297,8 @@ private
     end
   end
 end
+
+SOAPGenerator = Generator       # for backward compatibility
 
 
 end

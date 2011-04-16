@@ -56,7 +56,7 @@ public
     # TODO: set to false by default or drop thie option in 1.6.0
     @allow_unqualified_element = true
     @default_encodingstyle = nil
-    @generate_explicit_type = nil
+    @generate_explicit_type = true
     @use_default_namespace = false
     @return_response_as_xml = false
     @headerhandler = Header::HandlerSet.new
@@ -140,12 +140,6 @@ public
       :default_encodingstyle =>
         @default_encodingstyle || op_info.response_default_encodingstyle
     )
-    if reqopt[:generate_explicit_type].nil?
-      reqopt[:generate_explicit_type] = (op_info.request_use == :encoded)
-    end
-    if resopt[:generate_explicit_type].nil?
-      resopt[:generate_explicit_type] = (op_info.response_use == :encoded)
-    end
     env = route(req_header, req_body, reqopt, resopt)
     if op_info.response_use.nil?
       return nil
@@ -182,8 +176,8 @@ public
       conn_data.send_string = mime.content_str
       conn_data.send_contenttype = mime.headers['content-type'].str
     end
-    conn_data.soapaction = reqopt[:soapaction]
-    conn_data = @streamhandler.send(@endpoint_url, conn_data)
+    conn_data = @streamhandler.send(@endpoint_url, conn_data,
+      reqopt[:soapaction])
     if conn_data.receive_string.empty?
       return nil
     end
@@ -383,17 +377,25 @@ private
           RPC::SOAPMethodRequest.new(@rpc_request_qname, param_def, @soapaction)
       else
         @doc_request_qnames = []
+        @doc_request_qualified = []
         @doc_response_qnames = []
-        param_def.each do |param|
-          param = MethodDef.to_param(param)
-          case param.io_type
+        @doc_response_qualified = []
+        param_def.each do |inout, paramname, typeinfo, eleinfo|
+          klass_not_used, nsdef, namedef = typeinfo
+          qualified = eleinfo
+          if namedef.nil?
+            raise MethodDefinitionError.new("qname must be given")
+          end
+          case inout
           when SOAPMethod::IN
-            @doc_request_qnames << param.qname
+            @doc_request_qnames << XSD::QName.new(nsdef, namedef)
+            @doc_request_qualified << qualified
           when SOAPMethod::OUT
-            @doc_response_qnames << param.qname
+            @doc_response_qnames << XSD::QName.new(nsdef, namedef)
+            @doc_response_qualified << qualified
           else
             raise MethodDefinitionError.new(
-              "illegal inout definition for document style: #{param.io_type}")
+              "illegal inout definition for document style: #{inout}")
           end
         end
       end
@@ -501,6 +503,7 @@ private
       (0...values.size).collect { |idx|
         ele = Mapping.obj2soap(values[idx], mapping_registry, nil, opt)
         ele.elename = @doc_request_qnames[idx]
+        ele.qualified = @doc_request_qualified[idx]
         ele
       }
     end
@@ -510,6 +513,7 @@ private
         ele = Mapping.obj2soap(values[idx], mapping_registry,
           @doc_request_qnames[idx], opt)
         ele.encodingstyle = LiteralNamespace
+        ele.qualified = @doc_request_qualified[idx]
         ele
       }
     end

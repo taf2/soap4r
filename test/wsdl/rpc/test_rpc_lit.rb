@@ -21,8 +21,8 @@ class TestRPCLIT < Test::Unit::TestCase
         XSD::QName.new(Namespace, 'echoStringArray'),
         nil,
         'echoStringArray', [
-          [:in, 'inputStringArray', nil],
-          [:retval, 'return', nil]
+          ['in', 'inputStringArray', nil],
+          ['retval', 'return', nil]
         ],
         {
           :request_style => :rpc,
@@ -35,8 +35,8 @@ class TestRPCLIT < Test::Unit::TestCase
         XSD::QName.new(Namespace, 'echoStringArrayInline'),
         nil,
         'echoStringArrayInline', [
-          [:in, 'inputStringArray', nil],
-          [:retval, 'return', nil]
+          ['in', 'inputStringArray', nil],
+          ['retval', 'return', nil]
         ],
         {
           :request_style => :rpc,
@@ -49,8 +49,8 @@ class TestRPCLIT < Test::Unit::TestCase
         XSD::QName.new(Namespace, 'echoNestedStruct'),
         nil,
         'echoNestedStruct', [
-          [:in, 'inputNestedStruct', nil],
-          [:retval, 'return', nil]
+          ['in', 'inputNestedStruct', nil],
+          ['retval', 'return', nil]
         ],
         {
           :request_style => :rpc,
@@ -63,8 +63,8 @@ class TestRPCLIT < Test::Unit::TestCase
         XSD::QName.new(Namespace, 'echoStructArray'),
         nil,
         'echoStructArray', [
-          [:in, 'inputStructArray', nil],
-          [:retval, 'return', nil]
+          ['in', 'inputStructArray', nil],
+          ['retval', 'return', nil]
         ],
         {
           :request_style => :rpc,
@@ -155,8 +155,7 @@ class TestRPCLIT < Test::Unit::TestCase
 
   ECHO_STRING_ARRAY_REQUEST =
 %q[<?xml version="1.0" encoding="utf-8" ?>
-<env:Envelope xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    xmlns:env="http://schemas.xmlsoap.org/soap/envelope/"
+<env:Envelope xmlns:env="http://schemas.xmlsoap.org/soap/envelope/"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <env:Body>
     <n1:echoStringArray xmlns:n1="http://soapbuilders.org/rpc-lit-test">
@@ -171,8 +170,7 @@ class TestRPCLIT < Test::Unit::TestCase
 
   ECHO_STRING_ARRAY_RESPONSE =
 %q[<?xml version="1.0" encoding="utf-8" ?>
-<env:Envelope xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    xmlns:env="http://schemas.xmlsoap.org/soap/envelope/"
+<env:Envelope xmlns:env="http://schemas.xmlsoap.org/soap/envelope/"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <env:Body>
     <n1:echoStringArrayResponse xmlns:n1="http://soapbuilders.org/rpc-lit-test">
@@ -200,8 +198,7 @@ class TestRPCLIT < Test::Unit::TestCase
 
   ECHO_STRING_ARRAY_INLINE_REQUEST =
 %q[<?xml version="1.0" encoding="utf-8" ?>
-<env:Envelope xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    xmlns:env="http://schemas.xmlsoap.org/soap/envelope/"
+<env:Envelope xmlns:env="http://schemas.xmlsoap.org/soap/envelope/"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <env:Body>
     <n1:echoStringArrayInline xmlns:n1="http://soapbuilders.org/rpc-lit-test">
@@ -216,8 +213,7 @@ class TestRPCLIT < Test::Unit::TestCase
 
   ECHO_STRING_ARRAY_INLINE_RESPONSE =
 %q[<?xml version="1.0" encoding="utf-8" ?>
-<env:Envelope xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    xmlns:env="http://schemas.xmlsoap.org/soap/envelope/"
+<env:Envelope xmlns:env="http://schemas.xmlsoap.org/soap/envelope/"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <env:Body>
     <n1:echoStringArrayInlineResponse xmlns:n1="http://soapbuilders.org/rpc-lit-test">
@@ -244,8 +240,7 @@ class TestRPCLIT < Test::Unit::TestCase
 
   ECHO_NESTED_STRUCT_REQUEST =
 %q[<?xml version="1.0" encoding="utf-8" ?>
-<env:Envelope xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    xmlns:env="http://schemas.xmlsoap.org/soap/envelope/"
+<env:Envelope xmlns:env="http://schemas.xmlsoap.org/soap/envelope/"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <env:Body>
     <n1:echoNestedStruct xmlns:n1="http://soapbuilders.org/rpc-lit-test">
@@ -265,8 +260,7 @@ class TestRPCLIT < Test::Unit::TestCase
 
   ECHO_NESTED_STRUCT_RESPONSE =
 %q[<?xml version="1.0" encoding="utf-8" ?>
-<env:Envelope xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    xmlns:env="http://schemas.xmlsoap.org/soap/envelope/"
+<env:Envelope xmlns:env="http://schemas.xmlsoap.org/soap/envelope/"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <env:Body>
     <n1:echoNestedStructResponse xmlns:n1="http://soapbuilders.org/rpc-lit-test">
@@ -305,8 +299,7 @@ class TestRPCLIT < Test::Unit::TestCase
 
   ECHO_NESTED_STRUCT_REQUEST_NIL =
 %q[<?xml version="1.0" encoding="utf-8" ?>
-<env:Envelope xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    xmlns:env="http://schemas.xmlsoap.org/soap/envelope/"
+<env:Envelope xmlns:env="http://schemas.xmlsoap.org/soap/envelope/"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <env:Body>
     <n1:echoNestedStruct xmlns:n1="http://soapbuilders.org/rpc-lit-test">
@@ -325,8 +318,7 @@ class TestRPCLIT < Test::Unit::TestCase
 
   ECHO_NESTED_STRUCT_RESPONSE_NIL =
 %q[<?xml version="1.0" encoding="utf-8" ?>
-<env:Envelope xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    xmlns:env="http://schemas.xmlsoap.org/soap/envelope/"
+<env:Envelope xmlns:env="http://schemas.xmlsoap.org/soap/envelope/"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <env:Body>
     <n1:echoNestedStructResponse xmlns:n1="http://soapbuilders.org/rpc-lit-test">
@@ -386,8 +378,7 @@ class TestRPCLIT < Test::Unit::TestCase
 
   ECHO_STRUCT_ARRAY_REQUEST =
 %q[<?xml version="1.0" encoding="utf-8" ?>
-<env:Envelope xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    xmlns:env="http://schemas.xmlsoap.org/soap/envelope/"
+<env:Envelope xmlns:env="http://schemas.xmlsoap.org/soap/envelope/"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <env:Body>
     <n1:echoStructArray xmlns:n1="http://soapbuilders.org/rpc-lit-test">
@@ -409,8 +400,7 @@ class TestRPCLIT < Test::Unit::TestCase
 
   ECHO_STRUCT_ARRAY_RESPONSE =
 %q[<?xml version="1.0" encoding="utf-8" ?>
-<env:Envelope xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    xmlns:env="http://schemas.xmlsoap.org/soap/envelope/"
+<env:Envelope xmlns:env="http://schemas.xmlsoap.org/soap/envelope/"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <env:Body>
     <n1:echoStructArrayResponse xmlns:n1="http://soapbuilders.org/rpc-lit-test">

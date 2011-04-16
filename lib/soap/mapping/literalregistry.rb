@@ -136,12 +136,9 @@ private
       ele = SOAPElement.new(qname)
     end
     ele.qualified = definition.qualified
-    if definition.type
-      ele.type = definition.type
-      if definition.basetype or Mapping.root_type_hint
-        Mapping.reset_root_type_hint
-        ele.force_typed = true
-      end
+    if definition.type and (definition.basetype or Mapping.root_type_hint)
+      Mapping.reset_root_type_hint
+      ele.extraattr[XSD::AttrTypeName] = definition.type
     end
     if qname.nil? and definition.elename
       ele.elename = definition.elename
@@ -246,7 +243,7 @@ private
     obj = nil
     if obj_class == ::String
       obj = node.text
-    elsif obj_class < ::String and node.respond_to?(:text)
+    elsif obj_class < ::String
       obj = obj_class.new(node.text)
     else
       obj = Mapping.create_empty_object(obj_class)

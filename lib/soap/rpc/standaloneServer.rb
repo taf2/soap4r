@@ -14,7 +14,7 @@ module RPC
 
 
 class StandaloneServer < HTTPServer
-  def initialize(appname, default_namespace, host = "0.0.0.0", port = 8089)
+  def initialize(appname, default_namespace, host = "0.0.0.0", port = 8080)
     @appname = appname
     @default_namespace = default_namespace
     @host = host

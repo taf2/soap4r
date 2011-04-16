@@ -91,15 +91,11 @@ module Mapping
 
   def self.fault2exception(fault, registry = nil)
     registry ||= Mapping::DefaultRegistry
-    detail = ""
-    if fault.detail
-      begin
-        fault.detail.type ||= XSD::QName::EMPTY
-        detail = soap2obj(fault.detail, registry) || ""
-      rescue MappingError
-        detail = fault.detail
+    detail = if fault.detail
+        soap2obj(fault.detail, registry) || ""
+      else
+        ""
       end
-    end
     if detail.is_a?(Mapping::SOAPException)
       begin
         e = detail.to_e
@@ -154,8 +150,37 @@ module Mapping
     return registry.soap2obj(node, klass)
   end
 
-  def self.create_empty_object(klass)
-    klass.allocate
+  if Object.respond_to?(:allocate)
+    # ruby/1.7 or later.
+    def self.create_empty_object(klass)
+      klass.allocate
+    end
+  else
+    MARSHAL_TAG = {
+      String => ['"', 1],
+      Regexp => ['/', 2],
+      Array => ['[', 1],
+      Hash => ['{', 1]
+    }
+    def self.create_empty_object(klass)
+      if klass <= Struct
+	name = klass.name
+	return ::Marshal.load(sprintf("\004\006S:%c%s\000", name.length + 5, name))
+      end
+      if MARSHAL_TAG.has_key?(klass)
+	tag, terminate = MARSHAL_TAG[klass]
+	return ::Marshal.load(sprintf("\004\006%s%s", tag, "\000" * terminate))
+      end
+      MARSHAL_TAG.each do |k, v|
+	if klass < k
+	  name = klass.name
+	  tag, terminate = v
+	  return ::Marshal.load(sprintf("\004\006C:%c%s%s%s", name.length + 5, name, tag, "\000" * terminate))
+	end
+      end
+      name = klass.name
+      ::Marshal.load(sprintf("\004\006o:%c%s\000", name.length + 5, name))
+    end
   end
 
   # Allow only (Letter | '_') (Letter | Digit | '-' | '_')* here.
@@ -165,10 +190,9 @@ module Mapping
   #   ex. a.b => a.2eb
   #
   def self.name2elename(name)
-    name = name.to_s
     name.gsub(/([^a-zA-Z0-9:_\-]+)/n) {
       '.' << $1.unpack('H2' * $1.size).join('.')
-    }.gsub(/::/n, '..').to_sym
+    }.gsub(/::/n, '..')
   end
 
   def self.elename2name(name)
@@ -445,6 +469,12 @@ module Mapping
     schema_type = definition[:schema_type]
     is_anonymous = definition[:is_anonymous]
     schema_basetype = definition[:schema_basetype]
+    # wrap if needed for backward compatibility
+    if schema_ns
+      schema_name = Mapping.to_qname(schema_name, schema_ns) if schema_name
+      schema_type = Mapping.to_qname(schema_type, schema_ns) if schema_type
+      # no need for schema_basetype bacause it's introduced later
+    end
     schema_qualified = definition[:schema_qualified]
     schema_element = definition[:schema_element]
     schema_attributes = definition[:schema_attribute]
@@ -467,6 +497,7 @@ module Mapping
     definition
   end
 
+  # for backward compatibility
   # returns SchemaComplexTypeDefinition
   def self.parse_schema_definition(schema_element, default_ns)
     definition = nil
@@ -495,6 +526,7 @@ module Mapping
       if occurrence
         minoccurs, maxoccurs = occurrence
       else
+        # for backward compatibility
         minoccurs, maxoccurs = 1, 1
       end
       as_any = as_array = false

@@ -33,15 +33,15 @@ module ClassDefCreatorSupport
     ::SOAP::TypeMap[name]
   end
 
-  def dump_method_signature(name, operation, element_definitions)
-    methodname = safemethodname(name)
+  def dump_method_signature(operation, element_definitions)
+    name = operation.name
     input = operation.input
     output = operation.output
     fault = operation.fault
-    signature = "#{methodname}#{dump_inputparam(input)}"
+    signature = "#{ name }#{ dump_inputparam(input) }"
     str = <<__EOD__
 # SYNOPSIS
-#   #{methodname}#{dump_inputparam(input)}
+#   #{name}#{dump_inputparam(input)}
 #
 # ARGS
 #{dump_inout_type(input, element_definitions).chomp}
@@ -222,16 +222,6 @@ private
     return attribute.name if attribute.name 
     return attribute.ref if attribute.ref
     raise RuntimeError.new("cannot define name of #{attribute}")
-  end
-
-  # TODO: run MethodDefCreator just once in 1.6.X.
-  # MethodDefCreator should return parsed struct, not a String.
-  def collect_assigned_method(wsdl, porttypename, modulepath = nil)
-    name_creator = WSDL::SOAP::ClassNameCreator.new
-    methoddefcreator =
-      WSDL::SOAP::MethodDefCreator.new(wsdl, name_creator, modulepath, {})
-    methoddefcreator.dump(porttypename)
-    methoddefcreator.assigned_method
   end
 end
 

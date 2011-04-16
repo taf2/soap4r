@@ -35,8 +35,8 @@ class ServantSkeltonCreator
       result << "\n\n"
     end
     if porttype.nil?
-      @definitions.porttypes.each do |porttype|
-	result << dump_porttype(porttype)
+      @definitions.porttypes.each do |type|
+	result << dump_porttype(type.name)
 	result << "\n"
       end
     else
@@ -52,33 +52,24 @@ class ServantSkeltonCreator
 
 private
 
-  def dump_porttype(porttype)
-    assigned_method = collect_assigned_method(@definitions, porttype.name, @modulepath)
-    class_name = mapped_class_basename(porttype.name, @modulepath)
+  def dump_porttype(name)
+    class_name = mapped_class_basename(name, @modulepath)
     c = XSD::CodeGen::ClassDef.new(class_name)
     element_definitions = @definitions.collect_elements
-    binding = porttype.find_binding
-    if binding
-      binding.operations.each do |op_bind|
-        operation = op_bind.find_operation
-        if operation.nil?
-          warn("operation not found for binding: #{op_bind}")
-          next
+    operations = @definitions.porttype(name).operations
+    operations.each do |operation|
+      name = safemethodname(operation.name)
+      input = operation.input
+      params = input.find_message.parts.collect { |part|
+        safevarname(part.name)
+      }
+      m = XSD::CodeGen::MethodDef.new(name, params) do <<-EOD
+            p [#{params.join(", ")}]
+            raise NotImplementedError.new
+          EOD
         end
-        name = assigned_method[op_bind.boundid] || operation.name
-        methodname = safemethodname(name)
-        input = operation.input
-        params = input.find_message.parts.collect { |part|
-          safevarname(part.name)
-        }
-        m = XSD::CodeGen::MethodDef.new(methodname, params) do <<-EOD
-              p [#{params.join(", ")}]
-              raise NotImplementedError.new
-            EOD
-          end
-        m.comment = dump_method_signature(methodname, operation, element_definitions)
-        c.add_method(m)
-      end
+      m.comment = dump_method_signature(operation, element_definitions)
+      c.add_method(m)
     end
     c.dump
   end

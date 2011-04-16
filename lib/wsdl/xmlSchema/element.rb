@@ -7,7 +7,6 @@
 
 
 require 'wsdl/info'
-require 'wsdl/xmlSchema/ref'
 
 
 module WSDL
@@ -15,7 +14,26 @@ module XMLSchema
 
 
 class Element < Info
-  include Ref
+  class << self
+    if RUBY_VERSION > "1.7.0"
+      def attr_reader_ref(symbol)
+        name = symbol.to_s
+        define_method(name) {
+          instance_variable_get("@#{name}") ||
+            (refelement ? refelement.__send__(name) : nil)
+        }
+      end
+    else
+      def attr_reader_ref(symbol)
+        name = symbol.to_s
+        module_eval <<-EOS
+          def #{name}
+            @#{name} || (refelement ? refelement.#{name} : nil)
+          end
+        EOS
+      end
+    end
+  end
 
   attr_writer :name	# required
   attr_writer :form
@@ -37,6 +55,8 @@ class Element < Info
   attr_reader_ref :default
   attr_reader_ref :abstract
 
+  attr_accessor :ref
+
   def initialize(name = nil, type = nil)
     super()
     @name = name
@@ -55,6 +75,10 @@ class Element < Info
 
   def empty?
     !(local_simpletype || local_complextype || constraint || type)
+  end
+
+  def refelement
+    @refelement ||= (@ref ? root.collect_elements[@ref] : nil)
   end
 
   def targetnamespace
@@ -141,10 +165,6 @@ private
 
   def directelement?
     parent.is_a?(Schema)
-  end
-
-  def refelement
-    @refelement ||= (@ref ? root.collect_elements[@ref] : nil)
   end
 end
 

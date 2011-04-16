@@ -51,7 +51,7 @@ class XMLScanner < XSD::XMLParser::Parser
   end
 
   def warning(msg)
-    warn(msg)
+    p msg if $DEBUG
   end
 
   # def on_xmldecl; end

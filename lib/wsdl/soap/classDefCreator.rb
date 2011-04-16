@@ -49,30 +49,34 @@ class ClassDefCreator
       result << modulepath_split(@modulepath).collect { |ele| "module #{ele}" }.join("; ")
       result << "\n\n"
     end
-    str = dump_group(type)
-    unless str.empty?
-      result << "\n" unless result.empty?
-      result << str
-    end
-    str = dump_complextype(type)
-    unless str.empty?
-      result << "\n" unless result.empty?
-      result << str
-    end
-    str = dump_simpletype(type)
-    unless str.empty?
-      result << "\n" unless result.empty?
-      result << str
-    end
-    str = dump_element(type)
-    unless str.empty?
-      result << "\n" unless result.empty?
-      result << str
-    end
-    str = dump_attribute(type)
-    unless str.empty?
-      result << "\n" unless result.empty?
-      result << str
+    if type
+      result << dump_classdef(type.name, type)
+    else
+      str = dump_group
+      unless str.empty?
+        result << "\n" unless result.empty?
+        result << str
+      end
+      str = dump_complextype
+      unless str.empty?
+        result << "\n" unless result.empty?
+        result << str
+      end
+      str = dump_simpletype
+      unless str.empty?
+        result << "\n" unless result.empty?
+        result << str
+      end
+      str = dump_element
+      unless str.empty?
+        result << "\n" unless result.empty?
+        result << str
+      end
+      str = dump_attribute
+      unless str.empty?
+        result << "\n" unless result.empty?
+        result << str
+      end
     end
     if @modulepath
       result << "\n\n"
@@ -84,18 +88,16 @@ class ClassDefCreator
 
 private
 
-  def dump_element(target = nil)
+  def dump_element
     @elements.collect { |ele|
       next if @complextypes[ele.name]
-      next if target and target != ele.name
       c = create_elementdef(@modulepath, ele)
       c ? c.dump : nil
     }.compact.join("\n")
   end
 
-  def dump_attribute(target = nil)
+  def dump_attribute
     @attributes.collect { |attribute|
-      next if target and target != attribute.name
       if attribute.local_simpletype
         c = create_simpletypedef(@modulepath, attribute.name, attribute.local_simpletype)
       end
@@ -103,23 +105,21 @@ private
     }.compact.join("\n")
   end
 
-  def dump_simpletype(target = nil)
+  def dump_simpletype
     @simpletypes.collect { |type|
-      next if target and target != type.name
       c = create_simpletypedef(@modulepath, type.name, type)
       c ? c.dump : nil
     }.compact.join("\n")
   end
 
-  def dump_complextype(target = nil)
+  def dump_complextype
     definitions = sort_dependency(@complextypes).collect { |type|
-      next if target and target != type.name
       c = create_complextypedef(@modulepath, type.name, type)
       c ? c.dump : nil
     }.compact.join("\n")
   end
 
-  def dump_group(target = nil)
+  def dump_group
     definitions = @modelgroups.collect { |group|
       # TODO: not dumped for now but may be useful in the future
     }.compact.join("\n")
@@ -216,7 +216,7 @@ private
       if (const[constname] += 1) > 1
         constname += "_#{const[constname]}"
       end
-      c.def_const(constname, "new(#{ndq(value)})")
+      c.def_const(constname, "#{classname}.new(#{ndq(value)})")
     end
   end
 

@@ -62,11 +62,11 @@ private
     qname = XSD::QName.new(porttype.namespace, drivername)
     class_name = mapped_class_basename(qname, @modulepath)
     defined_const = {}
-    mdcreator = MethodDefCreator.new(@definitions, @name_creator, @modulepath, defined_const)
-    methoddef = mdcreator.dump(porttype)
+    result = MethodDefCreator.new(@definitions, @name_creator, @modulepath, defined_const).dump(porttype)
+    methoddef = result[:methoddef]
     binding = @definitions.bindings.find { |item| item.type == porttype }
     if binding.nil? or binding.soapbinding.nil?
-      # not bound or not a SOAP binding
+      # not bind or not a SOAP binding
       return ''
     end
     address = @definitions.porttype(porttype).locations[0]

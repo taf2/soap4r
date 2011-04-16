@@ -51,7 +51,6 @@ class ClientSkeltonCreator
 private
 
   def dump_porttype(porttype)
-    assigned_method = collect_assigned_method(@definitions, porttype.name, @modulepath)
     drv_name = mapped_class_basename(porttype.name, @modulepath)
 
     result = ""
@@ -64,24 +63,16 @@ obj.wiredump_dev = STDERR if $DEBUG
 
 __EOD__
     element_definitions = @definitions.collect_elements
-    binding = porttype.find_binding
-    if binding
-      binding.operations.each do |op_bind|
-        operation = op_bind.find_operation
-        if operation.nil?
-          warn("operation not found for binding: #{op_bind}")
-          next
-        end
-        name = assigned_method[op_bind.boundid] || operation.name
-        result << dump_method_signature(name, operation, element_definitions)
-        result << dump_input_init(operation.input) << "\n"
-        result << dump_operation(name, operation) << "\n\n"
-      end
+    porttype.operations.each do |operation|
+      result << dump_method_signature(operation, element_definitions)
+      result << dump_input_init(operation.input) << "\n"
+      result << dump_operation(operation) << "\n\n"
     end
     result
   end
 
-  def dump_operation(name, operation)
+  def dump_operation(operation)
+    name = operation.name
     input = operation.input
     "puts obj.#{ safemethodname(name) }#{ dump_inputparam(input) }"
   end

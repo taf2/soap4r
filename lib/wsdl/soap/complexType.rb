@@ -106,7 +106,6 @@ class ComplexType < Info
         end
       end
     end
-    nil
   end
 
   def find_arytype

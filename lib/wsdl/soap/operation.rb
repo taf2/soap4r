@@ -14,7 +14,7 @@ module SOAP
 
 
 class Operation < Info
-  class ParamInfo
+  class OperationInfo
     attr_reader :style
     attr_reader :op_name
     attr_reader :optype_name
@@ -67,6 +67,16 @@ class Operation < Info
     end
   end
 
+  def input_info
+    name_info = parent.find_operation.input_info
+    param_info(name_info, parent.input)
+  end
+
+  def output_info
+    name_info = parent.find_operation.output_info
+    param_info(name_info, parent.output)
+  end
+
   def operation_style
     return @style if @style
     if parent_binding.soapbinding
@@ -81,7 +91,7 @@ private
     parent.parent
   end
 
-  def create_param_info(name_info, param)
+  def param_info(name_info, param)
     op_style = operation_style()
     op_use = param.soapbody_use
     op_encodingstyle = param.soapbody_encodingstyle
@@ -102,7 +112,7 @@ private
       bodyparts = name_info.parts
     end
     faultpart = nil
-    ParamInfo.new(op_style, op_use, op_encodingstyle, op_name, optype_name,
+    OperationInfo.new(op_style, op_use, op_encodingstyle, op_name, optype_name,
       headerparts, bodyparts, faultpart, parent.soapaction)
   end
 end

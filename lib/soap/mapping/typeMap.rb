@@ -102,4 +102,5 @@ TypeMap = {
   SOAP::SOAPPositiveInteger::SOAPENCType => SOAPPositiveInteger,
 }
 
+
 end
