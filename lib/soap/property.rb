@@ -65,9 +65,10 @@ class Property
 
   KEY_REGSRC = '([^=:\\\\]*(?:\\\\.[^=:\\\\]*)*)'
   DEF_REGSRC = '\\s*' + KEY_REGSRC + '\\s*[=:]\\s*(.*)'
-  COMMENT_REGEXP = Regexp.new('^(?:#.*|)$', nil, 'u')
-  CATDEF_REGEXP = Regexp.new("^\\[\\s*#{KEY_REGSRC}\\s*\\]$", nil, 'u')
-  LINE_REGEXP = Regexp.new("^#{DEF_REGSRC}$", nil, 'u')
+  COMMENT_REGEXP = Regexp.new('^(?:#.*|)$')#, nil, 'u')
+  CATDEF_REGEXP = Regexp.new("^\\[\\s*#{KEY_REGSRC}\\s*\\]$")#, nil, 'u')
+  LINE_REGEXP = Regexp.new("^#{DEF_REGSRC}$")#, nil, 'u')
+
   def load(stream)
     key_prefix = ""
     stream.each_with_index do |line, lineno|
@@ -320,14 +321,14 @@ end
 
 
 # for ruby/1.6.
-unless Enumerable.instance_methods.include?('inject')
-  module Enumerable
-    def inject(init)
-      result = init
-      each do |item|
-	result = yield(result, item)
-      end
-      result
-    end
-  end
-end
+#unless Enumerable.instance_methods.include?('inject')
+#  module Enumerable
+#    def inject(init)
+#      result = init
+#      each do |item|
+#	result = yield(result, item)
+#      end
+#      result
+#    end
+#  end
+#end
